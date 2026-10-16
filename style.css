@@ -1,0 +1,61 @@
+/* ==========================================================
+   Pageturn – style.css
+   Controls how everything looks. No behaviour here.
+   ========================================================== */
+
+/* THEME: all colours are CSS variables, so the look can be changed in one place (black background, green text). */
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark;--bg:#000;--surf:#0a110a;--ink:#33ff66;--mute:#1fa045;--line:#14532d;--acc:#22c55e}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{height:100dvh}
+body{background:var(--bg);color:var(--ink);font:15px/1.4 Georgia,'Times New Roman',serif;display:flex;flex-direction:column;overflow:hidden}
+button,input{font:inherit;color:inherit}
+button{background:var(--surf);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:var(--acc)}button.on{background:var(--acc);color:#000;border-color:var(--acc)}
+/* TOP TOOLBAR: wraps onto extra lines on small screens. */
+#bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;background:var(--surf);border-bottom:1px solid var(--line)}
+#bar .sp{flex:1}
+#pg{width:52px;text-align:center;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.sw{width:24px;height:24px;border-radius:50%;padding:0;border:2px solid transparent}.sw.on{border-color:var(--ink)}
+/* READER LAYOUT: #main holds the page view (#vw) and the optional side panel (#side). */
+#main{flex:1;display:flex;min-height:0;position:relative}
+#view{flex:1;overflow:auto;padding:16px;text-align:center}
+#wrap{position:relative;display:inline-block;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.25);text-align:left}
+canvas{display:block}
+/* PDF PAGE LAYERS: the text layer is transparent text placed over the canvas so you can select it. */
+.textLayer{position:absolute;inset:0;overflow:hidden;line-height:1;z-index:2}
+.textLayer span{position:absolute;color:transparent;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(60,120,255,.35)}
+/* BOOKMARK RIBBON: coloured tab shown in the page corner when the page is bookmarked. */
+#rib{position:absolute;top:0;right:18px;width:22px;height:34px;z-index:3;pointer-events:none;display:none;clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%)}
+/* HIGHLIGHTS: drawn under the text layer; "multiply" blending lets the words show through the colour. In eraser mode they sit on top and become clickable. */
+#hl{position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:multiply}
+#hl.erase{z-index:3;pointer-events:auto}
+#hl div{position:absolute;border-radius:2px}#hl.erase div{cursor:not-allowed;outline:1px dashed #c00}
+/* MARKS PANEL: list of bookmarks and highlighted pages. */
+#side{width:280px;background:var(--surf);border-left:1px solid var(--line);overflow:auto;padding:12px;display:none}
+#side.open{display:block}
+#side h3{margin:4px 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.bm{display:flex;gap:6px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer}
+.bm:hover{border-color:var(--acc)}.bm b{flex:1;font-weight:normal}.bm small{color:var(--mute)}
+.bm button{padding:0 6px;border:0;background:none;color:var(--mute)}
+/* LIBRARY SCREEN: drop-zone and book cards. */
+#lib{flex:1;overflow:auto;padding:24px;max-width:720px;width:100%;margin:0 auto}
+#drop{border:2px dashed var(--line);border-radius:14px;padding:36px 16px;text-align:center;cursor:pointer;background:var(--surf)}
+#drop.over{border-color:var(--acc)}#drop h1{margin:0 0 6px;font-size:24px}#drop p{margin:0;color:var(--mute)}
+.book{display:flex;align-items:center;gap:10px;padding:12px;background:var(--surf);border:1px solid var(--line);border-radius:10px;margin-top:10px}
+.book .t{flex:1;min-width:0}.book .t b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.book .t small{color:var(--mute)}.prog{height:4px;background:var(--line);border-radius:2px;margin-top:6px}.prog i{display:block;height:100%;background:var(--acc);border-radius:2px}
+#msg{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.hide{display:none!important}
+/* PAGE VIEW: #vw is the positioning parent for the left/right page arrows (.nav). */
+#vw{flex:1;position:relative;min-width:0;display:flex}
+.nav{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:40px;height:68px;font-size:30px;line-height:1;padding:0;border-radius:12px;opacity:.85}
+#pl{left:6px}#nr{right:6px}
+/* MOBILE (phones): compact toolbar, bigger tap targets, slide-over panel, smaller page arrows, full-width pages. */
+@media(max-width:700px){
+#side{position:absolute;right:0;top:0;bottom:0;z-index:5;width:min(86vw,320px);box-shadow:-4px 0 14px rgba(0,0,0,.2)}
+.lbl{display:none}#bar{gap:5px;padding:6px 8px}#bar button{padding:8px 11px;min-height:38px}#bar .sp{flex-basis:100%;height:0}
+#pg{width:46px;padding:8px 4px}.sw{width:30px;height:30px;min-height:0!important;padding:0!important}
+#view{padding:8px 4px}.nav{width:30px;height:56px;font-size:24px;opacity:.6;border-radius:8px}#pl{left:2px}#nr{right:2px}
+#lib{padding:14px}#drop{padding:28px 12px}.book{flex-wrap:wrap}.book .t{flex-basis:100%}
+}
