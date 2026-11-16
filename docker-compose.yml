@@ -1,0 +1,33 @@
+services:
+  mongo:
+    image: mongo:7
+    # A replica set is required for transactions, even on one server.
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    restart: unless-stopped
+    volumes: [mongo-data:/data/db]
+    healthcheck:
+      test: >
+        mongosh --quiet --eval "try { if (rs.status().myState === 1) quit(0); quit(1) }
+        catch (e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo:27017'}]}); quit(1) }"
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 5s
+
+  api:
+    build: ./server
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MONGO_URI: mongodb://mongo:27017/pos?replicaSet=rs0
+    depends_on:
+      mongo: { condition: service_healthy }
+
+  web:
+    build: ./client
+    restart: unless-stopped
+    ports: ["80:80"]
+    depends_on: [api]
+
+volumes:
+  mongo-data:
